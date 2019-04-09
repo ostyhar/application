@@ -1,0 +1,31 @@
+- name: Install application.
+  apt: 
+    deb: "{{ app_deb_package }}"
+
+- name: Create app user.
+  user:
+    name: "{{ app_user }}"
+    comment: App user
+    system: yes
+
+- include: testing.yml
+
+- name: Composer install to remove dev dependecies.
+  composer:
+    command: install
+    working_dir: "{{ app_directory }}"
+  when: clean_composer_dev_deps
+
+- include: env.yml
+
+- name: Key Generate.
+  shell: 'php artisan key:generate'
+  args:
+    chdir: "{{ app_directory }}"
+
+- name: Chown Apps directory
+  file:
+    dest: "{{ app_directory }}"
+    owner: "{{ app_user }}"
+    group: "{{ app_group }}"
+    recurse: yes 
