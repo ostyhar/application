@@ -8,7 +8,14 @@
     comment: App user
     system: yes
 
+- name: Composer Install.
+  composer:
+    command: install
+    no_dev: no
+    working_dir: "{{ app_directory }}"
+
 - include: testing.yml
+- include: behat.yml
 
 - name: Composer install to remove dev dependecies.
   composer:
@@ -29,3 +36,9 @@
     owner: "{{ app_user }}"
     group: "{{ app_group }}"
     recurse: yes 
+
+- name: Configure laravel cronjob
+  cron:
+    name: Laravel Cron
+    user: "{{ app_user }}"
+    job: "cd {{ app_directory }} && php artisan schedule:run >> /dev/null 2>&1"

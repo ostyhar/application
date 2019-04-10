@@ -3,26 +3,26 @@
     path: "{{ app_directory }}/.env.testing"
   register: run_tests
 
-- name: Copy testing env file
-  copy:
-    src: "{{ app_directory }}/.env.testing"
-    dest: "{{ app_directory }}/.env"
-  when: run_tests.stat.exists
+- name: Check testing directory
+  stat:
+    path: "{{ app_directory }}/tests"
+  register: has_tests
 
-- name: Composer Install.
-  composer:
-    command: install
-    no_dev: no
-    working_dir: "{{ app_directory }}"
+- name: Run PHPUnit tests.
+  block:
+    - name: Copy testing env file
+      copy:
+        src: "{{ app_directory }}/.env.testing"
+        dest: "{{ app_directory }}/.env"
 
-- name: PHPUnit
-  shell: './vendor/bin/phpunit'
-  args:
-    chdir: "{{ app_directory }}"
-  when: run_tests.stat.exists
+    - name: Exec PHPUnit
+      shell: './vendor/bin/phpunit'
+      args:
+        chdir: "{{ app_directory }}"
+      when: run_tests.stat.exists
 
-- name: Remove testing env.
-  file:
-    path: "{{ app_directory }}/.env"
-    state: absent
-  when: run_tests.stat.exists
+    - name: Remove testing env.
+      file:
+        path: "{{ app_directory }}/.env"
+        state: absent
+  when: run_tests.stat.exists and has_tests.stat.exists
