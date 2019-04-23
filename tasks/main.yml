@@ -29,6 +29,8 @@
   shell: 'php artisan key:generate'
   args:
     chdir: "{{ app_directory }}"
+  when: laravel_app
+
 
 - name: Chown Apps directory
   file:
@@ -42,3 +44,5 @@
     name: Laravel Cron
     user: "{{ app_user }}"
     job: "cd {{ app_directory }} && php artisan schedule:run >> /dev/null 2>&1"
+  when: laravel_app
+
