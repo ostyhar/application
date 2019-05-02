@@ -11,14 +11,14 @@
 - name: Check if composer.json exists
   stat:
     path: "{{ app_directory }}/composer.json"
-  register: run_composer.stat.exists
+  register: run_composer
 
 - name: Composer Install.
   composer:
     command: install
     no_dev: no
     working_dir: "{{ app_directory }}"
-  when: run_composer
+  when: run_composer.stat.exists
 
 - include: testing.yml
 - include: behat.yml
