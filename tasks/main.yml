@@ -8,11 +8,17 @@
     comment: App user
     system: yes
 
+- name: Check if composer.json exists
+  stat:
+    path: "{{ app_directory }}/composer.json"
+  register: run_composer
+
 - name: Composer Install.
   composer:
     command: install
     no_dev: no
     working_dir: "{{ app_directory }}"
+  when: run_composer
 
 - include: testing.yml
 - include: behat.yml
@@ -21,7 +27,7 @@
   composer:
     command: install
     working_dir: "{{ app_directory }}"
-  when: clean_composer_dev_deps
+  when: clean_composer_dev_deps and run_composer
 
 - include: env.yml
 
