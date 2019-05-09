@@ -46,13 +46,13 @@
   command: "npm install --unsafe-perm"
   args:
         chdir: "{{ app_directory }}"
-  when: run_npm.stat.exists
+  when: npm_install and run_npm.stat.exists
 
 - name: npm run prod
   command: "npm run prod"
   args:
         chdir: "{{ app_directory }}"
-  when: run_npm.stat.exists
+  when: npm_install and run_npm.stat.exists
 
 - name: Chown Apps directory
   file:
