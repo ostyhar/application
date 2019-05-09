@@ -37,6 +37,22 @@
     chdir: "{{ app_directory }}"
   when: laravel_app
 
+- name: Check if npm package.json exists
+  stat:
+    path: "{{ app_directory }}/package.json"
+  register: run_npm
+
+- name: npm install
+  command: "npm install --unsafe-perm"
+  args:
+        chdir: "{{ app_directory }}"
+  when: run_npm.stat.exists
+
+- name: npm run prod
+  command: "npm run prod"
+  args:
+        chdir: "{{ app_directory }}"
+  when: run_npm.stat.exists
 
 - name: Chown Apps directory
   file:
