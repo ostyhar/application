@@ -22,14 +22,13 @@
 
 - include: testing.yml
 - include: behat.yml
+- include: env.yml
 
 - name: Composer install to remove dev dependecies.
   composer:
     command: install
     working_dir: "{{ app_directory }}"
   when: clean_composer_dev_deps and run_composer.stat.exists
-
-- include: env.yml
 
 - name: Key Generate.
   shell: 'php artisan key:generate'
