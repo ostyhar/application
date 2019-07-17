@@ -25,4 +25,5 @@
       file:
         path: "{{ app_directory }}/.env"
         state: absent
+      when: delete_env_after_test
   when: run_tests.stat.exists and has_tests.stat.exists

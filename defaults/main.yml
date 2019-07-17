@@ -4,3 +4,4 @@ app_group: www-data
 clean_composer_dev_deps: true
 laravel_app: true
 npm_install: true
+delete_env_after_test: true
