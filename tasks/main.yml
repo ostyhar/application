@@ -8,8 +8,6 @@
     comment: App user
     system: yes
 
-- include: env.yml
-
 - name: Check if composer.json exists
   stat:
     path: "{{ app_directory }}/composer.json"
@@ -24,6 +22,7 @@
 
 - include: testing.yml
 - include: behat.yml
+- include: env.yml
 
 - name: Composer install to remove dev dependecies.
   composer:
