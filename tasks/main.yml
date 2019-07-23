@@ -21,7 +21,6 @@
   when: run_composer.stat.exists
 
 - include: testing.yml
-- include: behat.yml
 - include: env.yml
 
 - name: Composer install to remove dev dependecies.
