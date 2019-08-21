@@ -13,6 +13,8 @@
     path: "{{ app_directory }}/composer.json"
   register: run_composer
 
+- include: env.yml
+
 - name: Composer Install.
   composer:
     command: install
