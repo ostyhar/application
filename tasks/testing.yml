@@ -27,3 +27,8 @@
         state: absent
       when: delete_env_after_test
   when: run_tests.stat.exists and has_tests.stat.exists
+
+- name: Composer install to remove dev dependecies.
+  composer:
+    command: install
+    working_dir: "{{ app_directory }}"
