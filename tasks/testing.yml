@@ -32,3 +32,4 @@
   composer:
     command: install
     working_dir: "{{ app_directory }}"
+  when: run_composer.stat.exists
