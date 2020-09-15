@@ -36,7 +36,7 @@
   shell: 'php artisan key:generate'
   args:
     chdir: "{{ app_directory }}"
-  when: laravel_app and app_key is not defined and not app_key
+  when: laravel_app and app_env.APP_KEY is not defined 
 
 - name: Check if npm package.json exists
   stat:
