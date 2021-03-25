@@ -30,6 +30,7 @@
   when: run_composer.stat.exists
 
 - include: testing.yml
+- include: behat.yml
 - include: env.yml
 
 - name: Key Generate.
