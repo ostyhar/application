@@ -30,6 +30,14 @@
   when: run_composer.stat.exists
 
 - include: testing.yml
+- include: behat.yml
+
+- name: Composer install to remove dev dependecies.
+  composer:
+    command: install
+    working_dir: "{{ app_directory }}"
+  when: run_composer.stat.exists
+
 - include: env.yml
 
 - name: Key Generate.
