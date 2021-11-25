@@ -15,10 +15,15 @@
         src: "{{ app_directory }}/.env.behat"
         dest: "{{ app_directory }}/.env"
 
-    - name: Run Behat tests.
+    - name: Run Behat pipeline tests.
       shell: 'vendor/bin/behat features/pipeline'
       args:
         chdir: "{{ app_directory }}"
+
+    - name: Run Behat UI tests.
+        shell: 'vendor/bin/behat features/ui'
+        args:
+          chdir: "{{ app_directory }}"
 
     - name: Remove behat env.
       file:
