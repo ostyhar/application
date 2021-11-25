@@ -29,23 +29,6 @@
     working_dir: "{{ app_directory }}"
   when: run_composer.stat.exists
 
-- include: testing.yml
-- include: behat.yml
-
-- name: Composer install to remove dev dependecies.
-  composer:
-    command: install
-    working_dir: "{{ app_directory }}"
-  when: run_composer.stat.exists
-
-- include: env.yml
-
-- name: Key Generate.
-  shell: 'php artisan key:generate'
-  args:
-    chdir: "{{ app_directory }}"
-  when: laravel_app and app_env.APP_KEY is not defined 
-
 - name: Check if npm package.json exists
   stat:
     path: "{{ app_directory }}/package.json"
@@ -62,6 +45,23 @@
   args:
     chdir: "{{ app_directory }}"
   when: npm_install and run_npm.stat.exists
+
+- include: testing.yml
+- include: behat.yml
+
+- name: Composer install to remove dev dependecies.
+  composer:
+    command: install
+    working_dir: "{{ app_directory }}"
+  when: run_composer.stat.exists
+
+- include: env.yml
+
+- name: Key Generate.
+  shell: 'php artisan key:generate'
+  args:
+    chdir: "{{ app_directory }}"
+  when: laravel_app and app_env.APP_KEY is not defined
 
 - name: Chown Apps directory
   file:
