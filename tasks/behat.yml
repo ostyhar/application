@@ -21,9 +21,9 @@
         chdir: "{{ app_directory }}"
 
     - name: Run Behat UI tests.
-        shell: 'vendor/bin/behat features/ui'
-        args:
-          chdir: "{{ app_directory }}"
+      shell: 'vendor/bin/behat features/ui'
+      args:
+        chdir: "{{ app_directory }}"
 
     - name: Remove behat env.
       file:
