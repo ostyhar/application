@@ -27,6 +27,8 @@
     command: install
     no_dev: no
     working_dir: "{{ app_directory }}"
+  environment:
+    COMPOSER_ALLOW_SUPERUSER: "1"
   when: run_composer.stat.exists
 
 - name: Check if npm package.json exists
