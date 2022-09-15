@@ -55,6 +55,8 @@
   composer:
     command: install
     working_dir: "{{ app_directory }}"
+  environment:
+    COMPOSER_ALLOW_SUPERUSER: "1"
   when: run_composer.stat.exists
 
 - include: env.yml
