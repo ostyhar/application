@@ -8,3 +8,5 @@ delete_env_after_test: true
 
 bitbucket_consumer_key: ""
 bitbucket_consumer_secret: ""
+
+minimum_laravel_version: "9.0.0"

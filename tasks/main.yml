@@ -13,6 +13,7 @@
     path: "{{ app_directory }}/composer.json"
   register: run_composer
 
+- include: validation.yml
 - include: env.yml
 
 - name: Set bitbucket auth for private composer packages.

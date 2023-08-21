@@ -1,29 +1,21 @@
-- name: Check testing env
-  stat:
-    path: "{{ app_directory }}/.env.testing"
-  register: run_tests
+# - name: Check for Laravel framework
 
-- name: Check testing directory
-  stat:
-    path: "{{ app_directory }}/tests"
-  register: has_tests
+
+# - name: Check for Craft CMS framework
+
+
+# - name:
+
 
 - name: Run PHPUnit tests.
   block:
-    - name: Copy testing env file
-      copy:
-        src: "{{ app_directory }}/.env.testing"
-        dest: "{{ app_directory }}/.env"
+    - name: Check for testing env
+      stat:
+        path: "{{ app_directory }}/.env.testing"
+      register: testing_env
+      failed_when: not testing_env.stat.exists
 
-    - name: Exec PHPUnit
+    - name: Run PHPUnit
       shell: './vendor/bin/phpunit'
       args:
         chdir: "{{ app_directory }}"
-      when: run_tests.stat.exists
-
-    - name: Remove testing env.
-      file:
-        path: "{{ app_directory }}/.env"
-        state: absent
-      when: delete_env_after_test
-  when: run_tests.stat.exists and has_tests.stat.exists
