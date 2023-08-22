@@ -82,15 +82,21 @@
 
     - include: env.yml
 
-    - name: Key Generate.
+    - name: Craft Security Key Generate.
+      shell: 'php craft setup/security-key'
+      args:
+        chdir: "{{ app_directory }}"
+      when: fact_craftcms_version | length > 0 and app_env.APP_KEY is not defined
+
+    - name: Artisan Key Generate.
       shell: 'php artisan key:generate'
       args:
         chdir: "{{ app_directory }}"
-      when: laravel_app and app_env.APP_KEY is not defined
+      when: fact_laravel_version | length > 0 and app_env.APP_KEY is not defined
 
     - name: Configure laravel cronjob
       cron:
         name: Laravel Cron
         user: "{{ app_user }}"
         job: "cd {{ app_directory }} && php artisan schedule:run >> /dev/null 2>&1"
-      when: laravel_app
+      when: fact_laravel_version | length > 0

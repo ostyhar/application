@@ -17,3 +17,15 @@
     path: "{{ app_directory }}/codeception.yaml"
   register: codeception_conf
   failed_when: not codeception_conf.stat.exists
+
+- name: Check for testing .env
+  stat:
+    path: "{{ app_directory }}/tests/.env"
+  register: codeception_env
+  failed_when: not codeception_env.stat.exists
+
+- name: Install mysql-client
+  apt:
+    name: mysql-client
+    state: present
+    install_recommends: no

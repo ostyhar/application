@@ -3,3 +3,9 @@
   args:
     chdir: "{{ app_directory }}"
   when: fact_laravel_version | length > 0
+
+- name: Run Codeception
+  shell: './vendor/bin/codecept run unit'
+  args:
+    chdir: "{{ app_directory }}"
+  when: fact_craftcms_version | length > 0
