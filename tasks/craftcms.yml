@@ -12,9 +12,9 @@
 - include_tasks: platform-override.yml
   when: fact_craftcms_version | regex_search('\d+[.]?\d*[.]?\d*') is not version(minimum_craftcms_version, '>=', strict=true)
 
-- name: Check for codeception.yaml
+- name: Check for codeception.yml
   stat:
-    path: "{{ app_directory }}/codeception.yaml"
+    path: "{{ app_directory }}/codeception.yml"
   register: codeception_conf
   failed_when: not codeception_conf.stat.exists
 
