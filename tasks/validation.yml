@@ -1,4 +1,4 @@
-- name: Display composer file
+- name: Load composer file
   shell: "cat {{ app_directory }}/composer.json"
   register: composer
 
@@ -12,47 +12,21 @@
   vars:
     jmesquery: 'require."laravel/framework"'
 
-- name: Print Laravel framework version
-  debug:
-    var: fact_laravel_version
-    verbosity: 1
-
 - name: Check for Craft CMS framework
   set_fact:
     fact_craftcms_version: "{{ jsondata | json_query(jmesquery) }}"
   vars:
     jmesquery: 'require."craftcms/cms"'
-  when: fact_laravel_version | length == 0
-
-- name: Print Craft CMS framework version
-  debug:
-    var: fact_craftcms_version
-    verbosity: 1
 
 - name: Check for unknown framework
   fail:
     msg: Could not recognise PHP framework.
   when: fact_laravel_version | length == 0 and fact_craftcms_version | length == 0
 
-- name: Check for outdated Laravel framework
-  debug:
-    msg: Laravel version ({{ fact_laravel_version }}) is too old to deploy. Please update laravel framework to v{{ minimum_laravel_version }} or request a Platform override.
-    verbosity: 0
-  when: fact_laravel_version | length > 0 and fact_laravel_version | regex_search('\d+[.]?\d*[.]?\d*') is not version(minimum_laravel_version, '>=', strict=true)
+- name: Include Laravel tasks
+  include_tasks: laravel.yml
+  when: fact_laravel_version | length > 0
 
-- name: Awaiting Platform override...
-  wait_for:
-    path: /tmp/platform
-    search_regex: ok
-    state: present
-    timeout: 3600
-    msg: Platform override timeout.
-  register: platform_override
-  when: fact_laravel_version | length > 0 and fact_laravel_version | regex_search('\d+[.]?\d*[.]?\d*') is not version(minimum_laravel_version, '>=', strict=true)
-
-
-
-
-- name: Fail because I said so
-  fail:
-    msg: I want to fail here.
+- name: Include Craft CMS tasks
+  include_tasks: craftcms.yml
+  when: fact_craftcms_version | length > 0

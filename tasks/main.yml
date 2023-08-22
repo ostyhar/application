@@ -1,3 +1,8 @@
+- name: Install ACL package
+  apt:
+    name: acl
+    state: present
+
 - name: Install application.
   apt: 
     deb: "{{ app_deb_package }}"
@@ -8,77 +13,84 @@
     comment: App user
     system: yes
 
-- name: Check if composer.json exists
-  stat:
-    path: "{{ app_directory }}/composer.json"
-  register: run_composer
-
-- include: validation.yml
-- include: env.yml
-
-- name: Set bitbucket auth for private composer packages.
-  shell: "composer config --global --auth bitbucket-oauth.bitbucket.org {{ bitbucket_consumer_key }} {{ bitbucket_consumer_secret }}"
-  when:
-    - bitbucket_consumer_key != ""
-    - bitbucket_consumer_secret != ""
-    - run_composer.stat.exists
-
-- name: Composer Install.
-  composer:
-    command: install
-    no_dev: no
-    working_dir: "{{ app_directory }}"
-  environment:
-    COMPOSER_ALLOW_SUPERUSER: "1"
-  when: run_composer.stat.exists
-
-- name: Check if npm package.json exists
-  stat:
-    path: "{{ app_directory }}/package.json"
-  register: run_npm
-
-- name: npm install
-  command: "npm install --unsafe-perm"
-  args:
-    chdir: "{{ app_directory }}"
-  when: npm_install and run_npm.stat.exists
-
-- name: npm run prod
-  command: "npm run prod"
-  args:
-    chdir: "{{ app_directory }}"
-  when: npm_install and run_npm.stat.exists
-
-- include: testing.yml
-- include: behat.yml
-
-- name: Composer install to remove dev dependecies.
-  composer:
-    command: install
-    working_dir: "{{ app_directory }}"
-  environment:
-    COMPOSER_ALLOW_SUPERUSER: "1"
-  when: run_composer.stat.exists
-
-- include: env.yml
-
-- name: Key Generate.
-  shell: 'php artisan key:generate'
-  args:
-    chdir: "{{ app_directory }}"
-  when: laravel_app and app_env.APP_KEY is not defined
-
 - name: Chown Apps directory
   file:
     dest: "{{ app_directory }}"
     owner: "{{ app_user }}"
     group: "{{ app_group }}"
-    recurse: yes 
+    recurse: yes
 
-- name: Configure laravel cronjob
-  cron:
-    name: Laravel Cron
-    user: "{{ app_user }}"
-    job: "cd {{ app_directory }} && php artisan schedule:run >> /dev/null 2>&1"
-  when: laravel_app
+- name: Create npm cache directory
+  file:
+    path: /var/www/.npm
+    state: directory
+    owner: "{{ app_user }}"
+    group: "{{ app_group }}"
+    mode: '0755'
 
+- name: Check if composer.json exists
+  stat:
+    path: "{{ app_directory }}/composer.json"
+  register: run_composer
+
+- name: Validate PHP framework
+  include_tasks: validation.yml
+
+- become: true
+  become_user: "{{ app_user }}"
+  block:
+    - name: Set bitbucket auth for private composer packages.
+      shell: "composer config --global --auth bitbucket-oauth.bitbucket.org {{ bitbucket_consumer_key }} {{ bitbucket_consumer_secret }}"
+      when:
+        - bitbucket_consumer_key != ""
+        - bitbucket_consumer_secret != ""
+        - run_composer.stat.exists
+
+    - name: Composer Install.
+      composer:
+        command: install
+        no_dev: no
+        working_dir: "{{ app_directory }}"
+      when: run_composer.stat.exists
+
+    - include: testing.yml
+
+    - name: Check if npm package.json exists
+      stat:
+        path: "{{ app_directory }}/package.json"
+      register: run_npm
+
+    - name: npm install
+      command: "npm install"
+      args:
+        chdir: "{{ app_directory }}"
+      when: npm_install and run_npm.stat.exists
+
+    - name: npm run prod
+      command: "npm run prod"
+      args:
+        chdir: "{{ app_directory }}"
+      when: npm_install and run_npm.stat.exists
+
+    - include: behat.yml
+
+    - name: Composer install to remove dev dependecies.
+      composer:
+        command: install
+        working_dir: "{{ app_directory }}"
+      when: run_composer.stat.exists
+
+    - include: env.yml
+
+    - name: Key Generate.
+      shell: 'php artisan key:generate'
+      args:
+        chdir: "{{ app_directory }}"
+      when: laravel_app and app_env.APP_KEY is not defined
+
+    - name: Configure laravel cronjob
+      cron:
+        name: Laravel Cron
+        user: "{{ app_user }}"
+        job: "cd {{ app_directory }} && php artisan schedule:run >> /dev/null 2>&1"
+      when: laravel_app

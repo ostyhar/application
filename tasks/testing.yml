@@ -1,21 +1,5 @@
-# - name: Check for Laravel framework
-
-
-# - name: Check for Craft CMS framework
-
-
-# - name:
-
-
-- name: Run PHPUnit tests.
-  block:
-    - name: Check for testing env
-      stat:
-        path: "{{ app_directory }}/.env.testing"
-      register: testing_env
-      failed_when: not testing_env.stat.exists
-
-    - name: Run PHPUnit
-      shell: './vendor/bin/phpunit'
-      args:
-        chdir: "{{ app_directory }}"
+- name: Run PHPUnit
+  shell: './vendor/bin/phpunit'
+  args:
+    chdir: "{{ app_directory }}"
+  when: fact_laravel_version | length > 0
