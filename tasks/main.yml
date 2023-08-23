@@ -20,10 +20,11 @@
     group: "{{ app_group }}"
     recurse: yes
 
-- name: Create npm cache directory
+- name: Chown npm cache directory
   file:
-    path: /var/www/.npm
+    path: /var/www/
     state: directory
+    recurse: yes
     owner: "{{ app_user }}"
     group: "{{ app_group }}"
     mode: '0755'
