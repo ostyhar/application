@@ -8,3 +8,6 @@ delete_env_after_test: true
 
 bitbucket_consumer_key: ""
 bitbucket_consumer_secret: ""
+
+minimum_laravel_version: "5.0.0"
+minimum_craftcms_version: "3.0.0"

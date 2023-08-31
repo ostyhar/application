@@ -1,0 +1,12 @@
+- name: Awaiting Platform override...
+  wait_for:
+    path: /tmp/platform
+    search_regex: ok
+    state: present
+    timeout: 3600
+    msg: Platform override timeout.
+
+- name: Platform override post actions
+  file:
+    path: /tmp/platform
+    state: absent

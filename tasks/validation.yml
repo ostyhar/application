@@ -1,0 +1,32 @@
+- name: Load composer file
+  shell: "cat {{ app_directory }}/composer.json"
+  register: composer
+
+- name: Save composer output
+  set_fact:
+    jsondata: "{{ composer.stdout | from_json }}"
+
+- name: Check for Laravel framework
+  set_fact:
+    fact_laravel_version: "{{ jsondata | json_query(jmesquery) }}"
+  vars:
+    jmesquery: 'require."laravel/framework"'
+
+- name: Check for Craft CMS framework
+  set_fact:
+    fact_craftcms_version: "{{ jsondata | json_query(jmesquery) }}"
+  vars:
+    jmesquery: 'require."craftcms/cms"'
+
+- name: Check for unknown framework
+  fail:
+    msg: Could not recognise PHP framework.
+  when: fact_laravel_version | length == 0 and fact_craftcms_version | length == 0
+
+- name: Include Laravel tasks
+  include_tasks: laravel.yml
+  when: fact_laravel_version | length > 0
+
+- name: Include Craft CMS tasks
+  include_tasks: craftcms.yml
+  when: fact_craftcms_version | length > 0

@@ -1,29 +1,11 @@
-- name: Check testing env
-  stat:
-    path: "{{ app_directory }}/.env.testing"
-  register: run_tests
+- name: Run PHPUnit
+  shell: './vendor/bin/phpunit'
+  args:
+    chdir: "{{ app_directory }}"
+  when: fact_laravel_version | length > 0
 
-- name: Check testing directory
-  stat:
-    path: "{{ app_directory }}/tests"
-  register: has_tests
-
-- name: Run PHPUnit tests.
-  block:
-    - name: Copy testing env file
-      copy:
-        src: "{{ app_directory }}/.env.testing"
-        dest: "{{ app_directory }}/.env"
-
-    - name: Exec PHPUnit
-      shell: './vendor/bin/phpunit'
-      args:
-        chdir: "{{ app_directory }}"
-      when: run_tests.stat.exists
-
-    - name: Remove testing env.
-      file:
-        path: "{{ app_directory }}/.env"
-        state: absent
-      when: delete_env_after_test
-  when: run_tests.stat.exists and has_tests.stat.exists
+- name: Run Codeception
+  shell: './vendor/bin/codecept run Unit'
+  args:
+    chdir: "{{ app_directory }}"
+  when: fact_craftcms_version | length > 0

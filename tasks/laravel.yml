@@ -1,0 +1,20 @@
+- name: Print Laravel framework version
+  debug:
+    var: fact_laravel_version
+    verbosity: 1
+
+- name: Check for outdated Laravel framework
+  debug:
+    msg: Laravel version ({{ fact_laravel_version }}) is too old to deploy. Please update laravel framework to v{{ minimum_laravel_version }} or request a Platform override.
+    verbosity: 0
+  when: fact_laravel_version | regex_search('\d+[.]?\d*[.]?\d*') is not version(minimum_laravel_version, '>=', strict=true)
+
+- include_tasks: platform-override.yml
+  when: fact_laravel_version | regex_search('\d+[.]?\d*[.]?\d*') is not version(minimum_laravel_version, '>=', strict=true)
+
+- name: Check for .env.testing
+  stat:
+    path: "{{ app_directory }}/.env.testing"
+  register: testing_env
+  failed_when: not testing_env.stat.exists
+  
