@@ -10,18 +10,8 @@
 
 - name: Run behat tests.
   block:
-    - name: Copy behat env file.
-      copy:
-        src: "{{ app_directory }}/.env.behat"
-        dest: "{{ app_directory }}/.env"
-
     - name: Run Behat pipeline tests.
       shell: 'vendor/bin/behat features/pipeline'
       args:
         chdir: "{{ app_directory }}"
-
-    - name: Remove behat env.
-      file:
-        path: "{{ app_directory }}/.env"
-        state: absent
   when: run_behat.stat.exists and behat_features.stat.exists
