@@ -55,6 +55,7 @@
       when: run_composer.stat.exists
 
     - include: testing.yml
+    - include: env.yml
 
     - name: Check if npm package.json exists
       stat:
@@ -80,8 +81,6 @@
         command: install
         working_dir: "{{ app_directory }}"
       when: run_composer.stat.exists
-
-    - include: env.yml
 
     - name: Craft Security Key Generate.
       shell: 'php craft setup/security-key'
