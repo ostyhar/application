@@ -2,6 +2,9 @@
   shell: "cat {{ app_directory }}/composer.json"
   register: composer
 
+- debug: msg="{{ composer.stdout }}"
+- debug: msg="{{ composer.stderr }}"
+
 - name: Save composer output
   set_fact:
     jsondata: "{{ composer.stdout | from_json }}"
