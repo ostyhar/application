@@ -68,14 +68,6 @@
         chdir: "{{ app_directory }}"
       when: npm_install and run_npm.stat.exists
 
-    - name: npm run prod
-      command: "npm run prod"
-      args:
-        chdir: "{{ app_directory }}"
-      when: npm_install and run_npm.stat.exists
-
-    - include: behat.yml
-
     - name: Composer install to remove dev dependecies.
       composer:
         command: install
